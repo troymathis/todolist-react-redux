@@ -11,7 +11,10 @@ const addTodoReducer = createSlice({
             return state
             
         },
-    }
+        removeTodos: (state,action) => {
+            return state.filter(item => item.id !== action.payload);
+        },
+    },
 })
 
 export const {addTodos } = addTodoReducer.actions;
