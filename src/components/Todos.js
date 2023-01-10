@@ -1,47 +1,82 @@
-import React, {useState} from "react";
+import React, { useState, useRef } from "react";
 import { connect } from "react-redux";
-import { addTodos } from "../redux/reducer";
-
+import { addTodos, removeTodos, updateTodos } from "../redux/reducer";
 
 const mapStateToProps = (state) => {
-    return {
-        todos: state,
-    };
+  return {
+    todos: state,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
-    return {
-        addTodo: (obj) => dispatch(addTodos(obj))
-    }
-}
+  return {
+    addTodo: (obj) => dispatch(addTodos(obj)),
+    removeTodo: (id) => dispatch(removeTodos(id)),
+    updateTodo: (obj) => dispatch(updateTodos(obj)),
+  };
+};
 
 const Todos = (props) => {
+  const [todo, setTodo] = useState("");
 
-    const [todo, setTodo] = useState("");
+  const inputRef = useRef(true);
 
-    const handleChange = (e) => {
-        setTodo(e.target.value);
+  const changeFocus = () => {
+    inputRef.current.disabled = false;
+    inputRef.current.focus();
+  }
+
+  const update = (id,value,e) => {
+    if(e.which === 13){
+        props.updateTodo({id, item:value});
+        inputRef.current.disabled = true;
     }
-console.log("props from store", props);
+  }
+  const handleChange = (e) => {
+    setTodo(e.target.value);
+  };
+  console.log("props from store", props);
   return (
     <div className="addTodos">
       Todos
-      <input type="text" onChange ={(e) => handleChange(e)}className="todo-input" />
-      <button className="add-btn" onClick={() => props.addTodo({
-        id: Math.floor(Math.random()*1000),
-        item: todo,
-        completed: false,
-      })}>Add</button>
+      <input
+        type="text"
+        onChange={(e) => handleChange(e)}
+        className="todo-input"
+      />
+      <button
+        className="add-btn"
+        onClick={() =>
+          props.addTodo({
+            id: Math.floor(Math.random() * 1000),
+            item: todo,
+            completed: false,
+          })
+        }
+      >
+        Add
+      </button>
       <br />
       <ul>
-        {
-            props.todos.map((item) => {
-                return <li key ={item.id}>{item.item}</li>;
-            })
-        }
+        {props.todos.map((item) => {
+          return (
+            <li key={item.id}>
+              <textarea
+                ref={inputRef}
+                disabled={inputRef}
+                defaultValue={item.item}
+                onKeyDown={(e) => update(item.id, inputRef.current.value, e)}
+              />
+              <button onClick={() => changeFocus()}>Edit</button>
+              <button onClick={() => props.removeTodo(item.id)}>
+                Delete
+              </button>{" "}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(Todos);
+export default connect(mapStateToProps, mapDispatchToProps)(Todos);
