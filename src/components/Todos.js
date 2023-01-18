@@ -29,7 +29,7 @@ const Todos = (props) => {
   //console.log("props from store", props);
   return (
     <div className="addTodos">
-      Todos
+      <br />
       <input
         type="text"
         onChange={(e) => handleChange(e)}
